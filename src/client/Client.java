@@ -22,7 +22,6 @@ public class Client {
 	public int ttl;
 	public int tempo;
 	public long startTime = System.currentTimeMillis();
-	public long timeOut = 6000;
 	String nomeArquivo;
 	
 	public Client(String nome, String IPClient, String porta, String[] enderecos, String caminho, String ttl,
@@ -61,7 +60,7 @@ public class Client {
 	public String NomeArquivo() {
 
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Solicitação de arquivo\n");
+		System.out.println("SolicitaÃ§Ã£o de arquivo\n");
 		System.out.println("Escreva o nome do arquivo desejado: ");
 		String nomeArquivo = scan.nextLine();
 		return nomeArquivo;
@@ -115,7 +114,7 @@ public class Client {
 			for (;;) {
 				criaMensagem(IPClient, porta, ttl);
 				long elapsed = System.currentTimeMillis() - startTime;
-				if (elapsed >= timeOut) {
+				if (elapsed >= tempo) {
 					System.out.printf("Console %s: Tempo esgotado para consulta do arquivo %s \n", nomeCliente, nomeArquivo);
 					break;
 				}
