@@ -9,18 +9,25 @@ import java.net.DatagramSocket;
 public class UDPListener extends Thread {
 	
 	int porta;
-	String peerComArquivo[];
+	String caminho;
+	String nomeArquivo;
+	private Client cliente;
 	
-	public UDPListener(int porta) {
-		this.porta = porta;	
+	public UDPListener(Client cliente) {
+		this.cliente = cliente;
+		this.porta = cliente.porta;	
+		this.caminho = cliente.caminho;
 	}
+	
 	@Override
-	public void run() {
+	public void run() {		
+		boolean running = true;
 		try {
+			System.out.println(porta);
 			DatagramSocket serverSocket = new DatagramSocket(porta);			
 			System.out.println("ouvindo...");
 			byte[] dadosRecebidos;
-			while(true) {
+			while(running) {
 				dadosRecebidos = new byte[1024];
 				
 				DatagramPacket pacoteRecebido = new DatagramPacket(dadosRecebidos, dadosRecebidos.length);
@@ -28,21 +35,18 @@ public class UDPListener extends Thread {
 				serverSocket.receive(pacoteRecebido);
 				
 				String mensagemRecebida = new String(pacoteRecebido.getData());
-				String[] mensagemInterpretada = mensagemRecebida.split(";");
-				
-				String peerIP = mensagemInterpretada[0];
-				int peerPorta = Integer.parseInt(mensagemInterpretada[1].trim());
-				peerComArquivo [0] = peerIP;
-				peerComArquivo [1] = Integer.toString(peerPorta);
-				
-				
-				
-			}
 			
+				long tamanhoArquivo = Integer.parseInt(mensagemRecebida.trim());
+				
+				cliente.tamanhoArquivo = tamanhoArquivo;
+
+			}
+			serverSocket.close();
 		}
 		catch(Exception ex) {
 			ex.printStackTrace();
 		}
+		
 	}
 	
 	

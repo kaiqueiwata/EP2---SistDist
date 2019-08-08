@@ -16,21 +16,24 @@ import client.UDPListener;
 public class Client {
 	public String nomeCliente;
 	public int porta;
+	public int portaTCP;
+	public long tamanhoArquivo;
 	public String IPClient;
 	public ArrayList<Peers> peers;
 	public String caminho;
 	public int ttl;
 	public int tempo;
 	public long startTime = System.currentTimeMillis();
-	String nomeArquivo;
+	public String nomeArquivo;
 	
 	public Client(String nome, String IPClient, String porta, String[] enderecos, String caminho, String ttl,
-			String tempo) {
+			String tempo, String portaTCP) {
 
 		this.nomeCliente = nome;
 		this.IPClient = IPClient;
 		this.porta = Integer.parseInt(porta);
 		this.caminho = caminho;
+		this.portaTCP = Integer.parseInt(portaTCP);
 		this.ttl = Integer.parseInt(ttl);
 		this.tempo = Integer.parseInt(tempo);
 
@@ -60,10 +63,10 @@ public class Client {
 	public String NomeArquivo() {
 
 		Scanner scan = new Scanner(System.in);
-		System.out.println("Solicitação de arquivo\n");
+		System.out.println("Solicitacao de arquivo");
 		System.out.println("Escreva o nome do arquivo desejado: ");
-		String nomeArquivo = scan.nextLine();
-		return nomeArquivo;
+		String fileName = scan.nextLine();
+		return fileName;
 
 	}
 
@@ -71,15 +74,16 @@ public class Client {
 
 	    nomeArquivo = NomeArquivo();
 		Peers peerReceptor = getPeerAleatorio();
-		String msg = String.format("%s;%d;%s;%d", IPCliente, portaCliente, nomeArquivo, TTL);
+		String msg = String.format("%s;%d;%s;%d;%d", IPCliente, portaCliente, nomeArquivo, TTL, portaTCP);
 
-		System.out.printf("Console %s: pesquisando por %s no peer %s.\n", nomeCliente, nomeArquivo,
+		System.out.printf("Console %s: pesquisando por %s no %s.\n", nomeCliente, nomeArquivo,
 				peerReceptor.nomePeer);
 
 		enviarMensagem(msg, peerReceptor.ipPeer, peerReceptor.portaPeer);
 
 	}
-
+	
+	//cliente UDP
 	private void enviarMensagem(String mensagem, String IPdestino, int portaDestino) {
 
 		try {
@@ -108,17 +112,17 @@ public class Client {
 	}
 
 	public void start() {
-		UDPListener listen = new UDPListener(porta);
+		TCPserver tcpServer = new TCPserver(this);
+		tcpServer.start();
+		UDPListener listen = new UDPListener(this);
 		listen.start();
 		while (true) {
-			for (;;) {
-				criaMensagem(IPClient, porta, ttl);
-				long elapsed = System.currentTimeMillis() - startTime;
-				if (elapsed >= tempo) {
-					System.out.printf("Console %s: Tempo esgotado para consulta do arquivo %s \n", nomeCliente, nomeArquivo);
-					break;
-				}
-			}
+			criaMensagem(IPClient, porta, ttl);
+//			long elapsed = System.currentTimeMillis() - startTime;
+//			if (elapsed >= tempo) {
+//				System.out.printf("Console %s: Tempo esgotado para consulta do arquivo %s \n", nomeCliente, nomeArquivo);
+//				break;
+//			}
 		}
 	}
 
